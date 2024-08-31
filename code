@@ -1,0 +1,69 @@
+`include "processor_defines.sv"
+module alu(
+    input logic [31:0] pc,
+    input logic [31:0] imm,
+    input logic [31:0] rs1_val,
+    input logic [31:0] rs2_val,
+    input logic [4:0] alu_control,
+    output logic rd_write_control,
+    output logic [31:0] rd_write_val
+);
+
+always @ (*) begin
+    rd_write_control = 1'b0;
+    rd_write_val = 32'h0;
+
+    case (alu_control)
+      5'd1: begin
+        rd_write_val =rs1_val+rs2_val;
+        rd_write_control=1'b1;
+      end
+      5'd2: begin
+        rd_write_val=rs1_val-rs2_val;
+        rd_write_control=1'b1;
+      end
+      5'd3: begin
+        rd_write_val=rs1_val^rs2_val;
+        rd_write_control=1'b1;
+      end
+      5'd4: begin
+        rd_write_val=rs1_val|rs2_val;
+        rd_write_control=1'b1;
+      end
+      5'd5: begin
+        rd_write_val=rs1_val&rs2_val;
+        rd_write_control=1'b1;  
+      end
+      5'd6: begin
+        rd_write_val=rs1_val <<rs2_val;
+        rd_write_control=1'b1;
+      end
+      5'd7: begin
+        rd_write_val=rs1_val>>rs2_val;
+        rd_write_control=1'b1;
+      end  
+      5'd8: begin
+        rd_write_val=rs1_val>>>rs2_val;
+        rd_write_control=1'b1;
+      end
+      default: begin
+        rd_write_val=32'h0;
+        rd_write_control=1'b1;
+    end
+      
+    endcase
+end
+   /*
+    Following section is necessary for dumping waveforms. This is needed for debug and simulations
+    */
+
+`ifndef DISABLE_WAVES
+   initial
+     begin
+        $dumpfile("./sim_build/alu.vcd");
+        $dumpvars(0, alu);
+     end
+`endif
+
+
+endmodule
